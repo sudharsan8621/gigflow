@@ -11,6 +11,11 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Handle 401 errors (unauthorized)
+    if (error.response?.status === 401) {
+      // Optional: redirect to login or clear local state
+      console.log('Unauthorized - please login again');
+    }
     return Promise.reject(error);
   }
 );
