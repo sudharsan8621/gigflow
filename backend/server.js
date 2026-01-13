@@ -19,7 +19,7 @@ const server = http.createServer(app);
 // Initialize Socket.io
 initializeSocket(server);
 
-// CORS Configuration - MUST BE BEFORE OTHER MIDDLEWARE
+// CORS Configuration
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
@@ -29,27 +29,32 @@ const allowedOrigins = [
 
 console.log('Allowed Origins:', allowedOrigins);
 
-app.use(cors({
+const corsOptions = {
   origin: function(origin, callback) {
     // Allow requests with no origin (mobile apps, Postman, curl)
     if (!origin) {
       return callback(null, true);
     }
     
-    if (allowedOrigins.includes(origin)) {
+    // Remove trailing slash for comparison
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    const normalizedAllowed = allowedOrigins.map(o => o.replace(/\/$/, ''));
+    
+    if (normalizedAllowed.includes(normalizedOrigin)) {
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
-      callback(null, true); // Allow all for now to debug
+      // Allow anyway for debugging (remove in production if needed)
+      callback(null, true);
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-}));
+};
 
-// Handle preflight requests
-app.options('*', cors());
+// Apply CORS middleware
+app.use(cors(corsOptions));
 
 // Body parser
 app.use(express.json());
@@ -65,6 +70,7 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     message: 'GigFlow API is running',
+    environment: process.env.NODE_ENV,
     allowedOrigins: allowedOrigins
   });
 });
