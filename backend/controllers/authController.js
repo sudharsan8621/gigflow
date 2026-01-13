@@ -5,6 +5,18 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
+// Cookie options based on environment
+const getCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  return {
+    httpOnly: true,
+    secure: isProduction, // true in production (HTTPS)
+    sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-site in production
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  };
+};
+
 const register = async (req, res) => {
   try {
     console.log('Register body:', req.body);
@@ -18,7 +30,6 @@ const register = async (req, res) => {
       });
     }
 
-    // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ 
@@ -27,22 +38,14 @@ const register = async (req, res) => {
       });
     }
 
-    // Create user
     const user = new User({ name, email, password });
     await user.save();
     
     console.log('User created:', user._id);
 
-    // Generate token
     const token = generateToken(user._id);
 
-    // Set cookie
-    res.cookie('jwt', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('jwt', token, getCookieOptions());
 
     return res.status(201).json({
       success: true,
@@ -75,7 +78,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Find user with password
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
@@ -85,7 +87,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Check password
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
@@ -95,16 +96,9 @@ const login = async (req, res) => {
       });
     }
 
-    // Generate token
     const token = generateToken(user._id);
 
-    // Set cookie
-    res.cookie('jwt', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('jwt', token, getCookieOptions());
 
     return res.status(200).json({
       success: true,
@@ -125,10 +119,15 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   res.cookie('jwt', '', { 
-    httpOnly: true, 
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     expires: new Date(0) 
   });
+  
   return res.status(200).json({ 
     success: true, 
     message: 'Logged out' 

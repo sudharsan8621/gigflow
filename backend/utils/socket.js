@@ -4,9 +4,14 @@ let io;
 const userSockets = new Map();
 
 const initializeSocket = (server) => {
+  const allowedOrigins = [
+    'http://localhost:5173',
+    process.env.FRONTEND_URL
+  ].filter(Boolean);
+
   io = socketIO(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+      origin: allowedOrigins,
       methods: ['GET', 'POST'],
       credentials: true,
     },
