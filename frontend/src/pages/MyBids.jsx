@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyBids } from '../store/slices/bidSlice';
 import Loader from '../components/Loader';
-import { FiDollarSign, FiExternalLink } from 'react-icons/fi';
+import { FiExternalLink } from 'react-icons/fi';
 
 const MyBids = () => {
   const dispatch = useDispatch();
@@ -13,6 +13,14 @@ const MyBids = () => {
 
   const statusColors = { pending: 'bg-yellow-100 text-yellow-800', hired: 'bg-green-100 text-green-800', rejected: 'bg-red-100 text-red-800' };
   const statusMessages = { pending: 'Waiting for client response', hired: 'Congratulations! You got the job!', rejected: 'Not selected for this project' };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
   if (loading) return <Loader />;
 
@@ -36,8 +44,8 @@ const MyBids = () => {
               <div className="bg-gray-50 rounded-lg p-4 mb-4"><p className="text-gray-600">{bid.message}</p></div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6 text-sm">
-                  <div className="flex items-center text-primary-600 font-semibold"><FiDollarSign /><span>Your Bid: ${bid.price}</span></div>
-                  <span className="text-gray-500">Budget: ${bid.gigId?.budget}</span>
+                  <div className="flex items-center text-primary-600 font-semibold"><span>Your Bid: {formatCurrency(bid.price)}</span></div>
+                  <span className="text-gray-500">Budget: {formatCurrency(bid.gigId?.budget)}</span>
                 </div>
                 <Link to={`/gigs/${bid.gigId?._id}`} className="btn btn-secondary flex items-center space-x-1"><span>View Gig</span><FiExternalLink /></Link>
               </div>

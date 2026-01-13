@@ -1,4 +1,4 @@
-import { FiDollarSign, FiUser, FiClock } from 'react-icons/fi';
+import { FiUser, FiClock } from 'react-icons/fi';
 
 const BidCard = ({ bid, onHire, isOwner, isHiring, gigStatus }) => {
   const statusColors = {
@@ -8,7 +8,15 @@ const BidCard = ({ bid, onHire, isOwner, isHiring, gigStatus }) => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(dateString).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
   return (
@@ -33,8 +41,7 @@ const BidCard = ({ bid, onHire, isOwner, isHiring, gigStatus }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1 text-primary-600">
-            <FiDollarSign />
-            <span className="font-bold text-lg">{bid.price}</span>
+            <span className="font-bold text-lg">{formatCurrency(bid.price)}</span>
           </div>
           <div className="flex items-center space-x-1 text-xs text-gray-400">
             <FiClock />

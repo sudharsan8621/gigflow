@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiDollarSign, FiUser, FiClock } from 'react-icons/fi';
+import { FiUser, FiClock } from 'react-icons/fi';
 
 const GigCard = ({ gig }) => {
   const statusColors = {
@@ -8,7 +8,15 @@ const GigCard = ({ gig }) => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(dateString).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
   return (
@@ -22,8 +30,7 @@ const GigCard = ({ gig }) => {
 
       <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
         <div className="flex items-center space-x-1">
-          <FiDollarSign />
-          <span className="font-semibold text-gray-800">${gig.budget}</span>
+          <span className="font-semibold text-gray-800">{formatCurrency(gig.budget)}</span>
         </div>
         <div className="flex items-center space-x-1">
           <FiUser />

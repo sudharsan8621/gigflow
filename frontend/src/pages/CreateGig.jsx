@@ -35,8 +35,9 @@ const CreateGig = () => {
             <textarea id="description" name="description" value={formData.description} onChange={handleChange} required minLength={20} maxLength={2000} rows={6} className="input resize-none" placeholder="Describe your project requirements..." />
           </div>
           <div>
-            <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">Budget (USD)</label>
-            <input type="number" id="budget" name="budget" value={formData.budget} onChange={handleChange} required min={1} className="input" placeholder="500" />
+            <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">Budget (₹ INR)</label>
+            <input type="number" id="budget" name="budget" value={formData.budget} onChange={handleChange} required min={1} className="input" placeholder="e.g., 5000" />
+            <p className="text-xs text-gray-500 mt-1">Enter amount in Indian Rupees</p>
           </div>
           <div className="flex items-center justify-end space-x-4">
             <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary">Cancel</button>

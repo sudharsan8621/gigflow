@@ -25,6 +25,14 @@ const GigBids = () => {
     }
   };
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   const isOwner = user && gig && user._id === gig.ownerId?._id;
   const loading = gigLoading || bidsLoading;
 
@@ -38,7 +46,7 @@ const GigBids = () => {
 
       <div className="card mb-8">
         <div className="flex items-start justify-between">
-          <div><h1 className="text-2xl font-bold text-gray-900 mb-2">{gig.title}</h1><p className="text-gray-600">Budget: ${gig.budget}</p></div>
+          <div><h1 className="text-2xl font-bold text-gray-900 mb-2">{gig.title}</h1><p className="text-gray-600">Budget: {formatCurrency(gig.budget)}</p></div>
           <span className={`px-3 py-1 rounded-full text-sm font-medium ${gig.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>{gig.status}</span>
         </div>
         {gig.status === 'assigned' && gig.hiredFreelancerId && <div className="mt-4 p-4 bg-green-50 rounded-lg"><p className="text-green-800"><span className="font-semibold">Assigned to:</span> {gig.hiredFreelancerId.name}</p></div>}

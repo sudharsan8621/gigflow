@@ -5,7 +5,7 @@ import { fetchGig } from '../store/slices/gigSlice';
 import { createBid } from '../store/slices/bidSlice';
 import Loader from '../components/Loader';
 import toast from 'react-hot-toast';
-import { FiDollarSign, FiUser, FiCalendar, FiMessageSquare } from 'react-icons/fi';
+import { FiUser, FiCalendar, FiMessageSquare } from 'react-icons/fi';
 
 const GigDetails = () => {
   const { id } = useParams();
@@ -32,7 +32,15 @@ const GigDetails = () => {
     else { toast.error(result.payload || 'Failed to submit bid'); }
   };
 
-  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-IN', { month: 'long', day: 'numeric', year: 'numeric' });
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
   if (loading) return <Loader />;
   if (!gig) return <div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-800">Gig not found</h2><Link to="/" className="text-primary-600 hover:underline mt-4 inline-block">Browse all gigs</Link></div>;
@@ -46,7 +54,7 @@ const GigDetails = () => {
             <h1 className="text-3xl font-bold text-gray-900">{gig.title}</h1>
           </div>
           <div className="text-right">
-            <div className="flex items-center text-2xl font-bold text-primary-600"><FiDollarSign /><span>{gig.budget}</span></div>
+            <div className="text-2xl font-bold text-primary-600">{formatCurrency(gig.budget)}</div>
             <span className="text-sm text-gray-500">Budget</span>
           </div>
         </div>
@@ -77,8 +85,8 @@ const GigDetails = () => {
                 <textarea id="message" name="message" value={bidData.message} onChange={handleBidChange} required minLength={10} rows={4} className="input resize-none" placeholder="Explain why you're the best fit..." />
               </div>
               <div>
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">Your Price (USD)</label>
-                <input type="number" id="price" name="price" value={bidData.price} onChange={handleBidChange} required min={1} className="input" placeholder="Enter your bid amount" />
+                <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">Your Price (₹ INR)</label>
+                <input type="number" id="price" name="price" value={bidData.price} onChange={handleBidChange} required min={1} className="input" placeholder="Enter your bid amount in rupees" />
               </div>
               <div className="flex items-center justify-end space-x-4">
                 <button type="button" onClick={() => setShowBidForm(false)} className="btn btn-secondary">Cancel</button>
