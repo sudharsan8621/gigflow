@@ -20,45 +20,30 @@ const server = http.createServer(app);
 initializeSocket(server);
 
 // CORS Configuration
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'https://gigflow-one.vercel.app',
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
-console.log('Allowed Origins:', allowedOrigins);
-
 const corsOptions = {
-  origin: function(origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, curl)
-    if (!origin) {
-      return callback(null, true);
-    }
-    
-    // Remove trailing slash for comparison
-    const normalizedOrigin = origin.replace(/\/$/, '');
-    const normalizedAllowed = allowedOrigins.map(o => o.replace(/\/$/, ''));
-    
-    if (normalizedAllowed.includes(normalizedOrigin)) {
-      callback(null, true);
-    } else {
-      console.log('CORS blocked origin:', origin);
-      // Allow anyway for debugging (remove in production if needed)
-      callback(null, true);
-    }
-  },
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://gigflow-one.vercel.app'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 };
 
-// Apply CORS middleware
+// Apply CORS
 app.use(cors(corsOptions));
 
 // Body parser
 app.use(express.json());
 app.use(cookieParser());
+
+// Debug middleware - log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  console.log('Cookies:', req.cookies);
+  next();
+});
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -71,7 +56,6 @@ app.get('/api/health', (req, res) => {
     status: 'ok', 
     message: 'GigFlow API is running',
     environment: process.env.NODE_ENV,
-    allowedOrigins: allowedOrigins
   });
 });
 

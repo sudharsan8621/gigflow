@@ -4,19 +4,19 @@ let io;
 const userSockets = new Map();
 
 const initializeSocket = (server) => {
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'https://gigflow-one.vercel.app/',
-    process.env.FRONTEND_URL
-  ].filter(Boolean);
-
   io = socketIO(server, {
     cors: {
-      origin: allowedOrigins,
+      origin: [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://gigflow-one.vercel.app'
+      ],
       methods: ['GET', 'POST'],
       credentials: true,
+      allowedHeaders: ['Content-Type', 'Authorization'],
     },
+    transports: ['websocket', 'polling'],
+    allowEIO3: true,
   });
 
   io.on('connection', (socket) => {
@@ -26,7 +26,7 @@ const initializeSocket = (server) => {
       if (userId) {
         userSockets.set(userId, socket.id);
         socket.join(userId);
-        console.log(`User ${userId} joined`);
+        console.log(`User ${userId} joined room`);
       }
     });
 
